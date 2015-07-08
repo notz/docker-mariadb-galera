@@ -1,15 +1,9 @@
 #!/bin/bash
 set -e
 
-CMD=("")
-
-if [ -n "$1" ]; then
-    CMD=("$@")
-fi
-
-until [ -n "$CMD" ]; do
+while [ -z "$@" ]; do
     if [ -e "/tmp/cmd" ]; then
-        CMD=($(</tmp/cmd))
+        set -- "$(</tmp/cmd)"
         rm -f /tmp/cmd
     fi
 
@@ -17,9 +11,13 @@ until [ -n "$CMD" ]; do
     sleep 10
 done
 
-if [ "${CMD[0]}" = 'mysqld' ]; then
+if [ "${1:0:1}" = '-' ]; then
+    set -- mysqld "$@"
+fi
+
+if [ "$1" = 'mysqld' ]; then
     # read DATADIR from the MySQL config
-    DATADIR="$("${CMD[@]}" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
+    DATADIR="$("$@" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
 
     if [ ! -d "$DATADIR/mysql" ]; then
         if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" ]; then
@@ -58,10 +56,10 @@ EOSQL
 
         echo 'FLUSH PRIVILEGES ;' >> "$tempSqlFile"
 
-        CMD=("${CMD[@]} --init-file=\"$tempSqlFile\"")
+        set -- "$@" --init-file="$tempSqlFile"
     fi
 
     chown -R mysql:mysql "$DATADIR"
 fi
 
-exec "${CMD[@]}"
+exec "$@"
