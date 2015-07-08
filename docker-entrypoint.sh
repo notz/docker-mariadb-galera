@@ -15,7 +15,7 @@ if [ "${1:0:1}" = '-' ]; then
     set -- mysqld "$@"
 fi
 
-if [ "$1" = 'mysqld' ]; then
+if [ "${1##*/}" = 'mysqld' ]; then
     # read DATADIR from the MySQL config
     DATADIR="$("$@" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
 
