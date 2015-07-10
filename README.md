@@ -4,12 +4,14 @@
 
 # How to use this image.
 
-When you run the image without giving any command, the entrypoint will loop infinitely until you create, inside de container, a file at `/tmp/cmd`.
-When the `/tmp/cmd` file is created, the entrypoint get the file content as string and execute it.
+When you run the image without giving any command, the entrypoint will listen at port 3306 waiting for a command.
+To send a command, jun run:
+
+    echo "command here" | nc ip_of_container
 
 So, basically, you can get a cluster running by following the steps:
 
-- start each node with:
+- start each container with:
 
 ```
 docker run \
@@ -26,16 +28,17 @@ docker run \
 gcomm://10.0.0.1,10.0.0.2,10.0.0.3
 ```
 
-- choose one of the hosts to start as new cluster:
+- start first container as new cluster:
 
 ```
-docker exec NAME_OF_CONTAINER /bin/sh -c "echo 'mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3' > /tmp/cmd"
+echo "mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost
 ```
 
-- on all the subsequent nodes, one at a time, starts it as part of existing cluster:
+- on all the subsequent containers, one at a time, starts it as part of existing cluster:
 
 ```
-docker exec NAME_OF_CONTAINER /bin/sh -c "echo 'mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3' > /tmp/cmd"
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost
 ```
 
 That's it, now you should have a running MariaDB cluster.
