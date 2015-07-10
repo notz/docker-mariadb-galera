@@ -1,23 +1,16 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
-while [ -z "$@" ]; do
-    if [ -e "/tmp/cmd" ]; then
-        set -- "$(</tmp/cmd)"
-        rm -f /tmp/cmd
-    fi
+CMD="$@"
 
+if [ -z "$CMD" ]; then
     echo "Waiting for instructions..."
-    sleep 10
-done
-
-if [ "${1:0:1}" = '-' ]; then
-    set -- mysqld "$@"
+    CMD="$(nc -l 3306 2>&1)"
 fi
 
-if [ "${1##*/}" = 'mysqld' ]; then
+if [ "${CMD[0]}" = 'mysqld' ]; then
     # read DATADIR from the MySQL config
-    DATADIR="$("$@" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
+    DATADIR="$("${CMD[@]}" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
 
     if [ ! -d "$DATADIR/mysql" ]; then
         if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" ]; then
@@ -35,12 +28,10 @@ if [ "${1##*/}" = 'mysqld' ]; then
         # TODO proper SQL escaping on ALL the things D:
 
         tempSqlFile='/tmp/mysql-first-time.sql'
-        cat > "$tempSqlFile" <<-EOSQL
-DELETE FROM mysql.user ;
-CREATE USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' ;
-GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;
-DROP DATABASE IF EXISTS test ;
-EOSQL
+        echo "DELETE FROM mysql.user ;" >> "$tempSqlFile"
+        echo "CREATE USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' ;" >> "$tempSqlFile"
+        echo "GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;" >> "$tempSqlFile"
+        echo "DROP DATABASE IF EXISTS test ;" >> "$tempSqlFile"
 
         if [ "$MYSQL_DATABASE" ]; then
             echo "CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;" >> "$tempSqlFile"
@@ -56,10 +47,10 @@ EOSQL
 
         echo 'FLUSH PRIVILEGES ;' >> "$tempSqlFile"
 
-        set -- "$@" --init-file="$tempSqlFile"
+        CMD="${CMD[@]} --init-file=\"$tempSqlFile\""
     fi
 
     chown -R mysql:mysql "$DATADIR"
 fi
 
-exec "$@"
+exec "${CMD[@]}"
