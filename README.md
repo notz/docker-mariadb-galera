@@ -4,7 +4,7 @@
 
 # How to use this image.
 
-When you run the image without giving any command, the entrypoint will listen at port 3306 waiting for a command.
+When you run the image without giving any command, the entrypoint will listen at port 13306 waiting for a command.
 To send a command, jun run:
 
     echo "command here" | nc ip_of_container port
@@ -31,14 +31,14 @@ gcomm://10.0.0.1,10.0.0.2,10.0.0.3
 - start first container as new cluster:
 
 ```
-echo "mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 3306
+echo "mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
 ```
 
 - on all the subsequent containers, one at a time, starts it as part of existing cluster:
 
 ```
-echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 3306
-echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 3306
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
 ```
 
 That's it, now you should have a running MariaDB cluster.

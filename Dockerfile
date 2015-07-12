@@ -28,4 +28,4 @@ VOLUME /var/lib/mysql
 COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-EXPOSE 3306 4567 4568 4444
+EXPOSE 3306 4567 4568 4444 13306
