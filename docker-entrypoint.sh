@@ -5,7 +5,7 @@ CMD="$@"
 
 if [ -z "$CMD" ]; then
     echo "Waiting for instructions..."
-    CMD=($(nc -l 13307 2>&1))
+    read -a CMD <<<$(nc -l 13307 2>&1)
 fi
 
 if [ "${CMD[0]}" = 'mysqld' ]; then
