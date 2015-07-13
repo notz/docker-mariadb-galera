@@ -53,4 +53,4 @@ if [ "${CMD[0]}" = 'mysqld' ]; then
     chown -R mysql:mysql "$DATADIR"
 fi
 
-exec "${CMD[@]}"
+exec ${CMD[@]}
