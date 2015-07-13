@@ -47,7 +47,7 @@ if [ "${CMD[0]}" = 'mysqld' ]; then
 
         echo 'FLUSH PRIVILEGES ;' >> "$tempSqlFile"
 
-        CMD="${CMD[@]} --init-file=\"$tempSqlFile\""
+        CMD=("${CMD[@]} --init-file=$tempSqlFile")
     fi
 
     chown -R mysql:mysql "$DATADIR"
