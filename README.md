@@ -31,14 +31,14 @@ gcomm://10.0.0.1,10.0.0.2,10.0.0.3
 - start first container as new cluster:
 
 ```
-echo "mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
+echo "mysqld --wsrep-new-cluster --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc 10.0.0.1 13306
 ```
 
 - on all the subsequent containers, one at a time, starts it as part of existing cluster:
 
 ```
-echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
-echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc localhost 13306
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc 10.0.0.2 13306
+echo "mysqld --wsrep-cluster-address=gcomm://10.0.0.1,10.0.0.2,10.0.0.3" | nc 10.0.0.3 13306
 ```
 
 That's it, now you should have a running MariaDB cluster.
