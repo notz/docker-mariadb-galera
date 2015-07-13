@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 CMD="$@"
 
 if [ -z "$CMD" ]; then
     echo "Waiting for instructions..."
-    read -a CMD <<<$(nc -l 13307 2>&1)
+    CMD=($(nc -l 13306 2>&1))
 fi
 
 if [ "${CMD[0]}" = 'mysqld' ]; then
