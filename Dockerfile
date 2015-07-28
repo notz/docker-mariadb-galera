@@ -17,8 +17,6 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive \
         apt-get install -y mariadb-galera-server xtrabackup netcat-openbsd socat pv
 
-RUN apt-get install -y xtrabackup netcat-openbsd socat pv
-
 RUN rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql \
     && sed -Ei 's/^(bind-address)/#&/' /etc/mysql/my.cnf
