@@ -28,10 +28,13 @@ if [ "${CMD[0]}" = 'mysqld' ]; then
         # TODO proper SQL escaping on ALL the things D:
 
         tempSqlFile='/tmp/mysql-first-time.sql'
-        echo "DELETE FROM mysql.user ;" >> "$tempSqlFile"
-        echo "CREATE USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' ;" >> "$tempSqlFile"
-        echo "GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;" >> "$tempSqlFile"
-        echo "DROP DATABASE IF EXISTS test ;" >> "$tempSqlFile"
+
+cat > "$tempSqlFile" <<-EOSQL
+DELETE FROM mysql.user ;
+CREATE USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' ;
+GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;
+DROP DATABASE IF EXISTS test ;
+EOSQL
 
         if [ "$MYSQL_DATABASE" ]; then
             echo "CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;" >> "$tempSqlFile"
