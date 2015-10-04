@@ -12,7 +12,7 @@ RUN groupadd -r mysql && useradd -r -g mysql mysql \
         } > /etc/apt/preferences.d/mariadb \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive \
-        apt-get install -y --no-install-recommends mariadb-galera-server xtrabackup netcat-openbsd socat pv \
+        apt-get install -y --no-install-recommends mariadb-galera-server galera-arbitrator-3 xtrabackup netcat-openbsd socat pv \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql \
     && sed -Ei 's/^(bind-address)/#&/' /etc/mysql/my.cnf
